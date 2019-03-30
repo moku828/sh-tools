@@ -1,5 +1,5 @@
 # sh-tools
-Toolchain for SH7262(make, qemu, gdb)
+Toolchain for SH7262(make, qemu, gdb) and TOPPERS sample
 
 ## make
     docker build -t sh-tools/make .
