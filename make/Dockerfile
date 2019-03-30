@@ -13,8 +13,14 @@ WORKDIR /build
 RUN wget -nv http://ftp.tsukuba.wide.ad.jp/software/gcc/releases/gcc-3.4.5/gcc-3.4.5.tar.bz2
 RUN tar jxf gcc-3.4.5.tar.bz2
 RUN sed -i -e "s/O_CREAT/O_CREAT, 0755/g" gcc-3.4.5/gcc/collect2.c
+WORKDIR /build
+RUN wget -nv ftp://sourceware.org/pub/newlib/newlib-1.14.0.tar.gz
+RUN tar zxf newlib-1.14.0.tar.gz
+WORKDIR /build/gcc-3.4.5
+RUN ln -s ../newlib-1.14.0/newlib ../newlib-1.14.0/libgloss ../newlib-1.14.0/COPYING.NEWLIB .
 WORKDIR /build/gcc-3.4.5/build
-RUN ../configure --target=sh-elf --enable-languages=c --prefix=/usr/local/sh-tools
+ENV CFLAGS ""
+RUN ../configure --target=sh-elf --enable-languages=c --prefix=/usr/local/sh-tools -with-newlib -with-headers=/build/newlib-1.14.0/newlib/libc/include
 RUN make -s -j8
 RUN make -s install
 
