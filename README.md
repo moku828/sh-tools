@@ -13,6 +13,7 @@ Toolchain for SH7262(make, qemu, gdb) and TOPPERS sample
     docker run --rm -it -vC:\test\toppers_sample\asp:/asp sh-tools/toppers_sample make depend
     docker run --rm -it -vC:\test\toppers_sample\asp:/asp sh-tools/toppers_sample make
     docker run --rm -it -vC:\test\toppers_sample\asp:/asp sh-tools/toppers_sample make asp.bin
+    docker run --rm -it -vC:\test\toppers_sample\asp:/asp sh-tools/toppers_sample sh-elf-nm asp | grep \s__kernel_start$
 
 ## qemu
     docker build -t sh-tools/qemu .
