@@ -4,6 +4,7 @@ Toolchain for SH7262(make, qemu, gdb) and TOPPERS sample
 ## make
     docker build -t sh-tools/make .
     docker run --rm -it -vC:\Users\basas\Downloads\sh7262_bootrom-sh2a_isa_test:/workspace sh-tools/make
+    docker run --rm -it -vC:\test\sh7262_an\task:/workspace --entrypoint=/usr/local/sh-tools/bin/sh-elf-nm sh-tools/make task.elf
 
 ## toppers_sample
     docker build -t sh-tools/toppers_sample .
