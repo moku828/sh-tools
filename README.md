@@ -15,6 +15,8 @@ Toolchain for SH7262(make, qemu, gdb) and TOPPERS sample
     docker run --rm -it -vC:\test\toppers_sample\asp:/asp sh-tools/toppers_sample make
     docker run --rm -it -vC:\test\toppers_sample\asp:/asp sh-tools/toppers_sample make asp.bin
     docker run --rm -it -vC:\test\toppers_sample\asp:/asp sh-tools/toppers_sample sh-elf-nm asp | grep \s__kernel_start$
+HJ-LINK/USB Debugger for SH7262起動
+Download program...からasp選んでPC:1C0004E4(__kernel_startのアドレス)に書き換えてRun
 
 ## qemu
     docker build -t sh-tools/qemu .
