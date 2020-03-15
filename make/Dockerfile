@@ -1,26 +1,52 @@
-FROM gcc:7.4.0 AS build-env
-WORKDIR /build
-RUN wget -nv http://ftp.jaist.ac.jp/pub/GNU/binutils/binutils-2.16.1.tar.bz2
-RUN tar jxf binutils-2.16.1.tar.bz2
-RUN rm -rf binutils-2.16.1/gprof/*.m
-WORKDIR /build/binutils-2.16.1/build
+FROM gcc:5.4.0 AS build-env
 ENV PATH $PATH:/usr/local/sh-tools/bin
-ENV CFLAGS "-fno-stack-protector -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=0"
+ENV LD_LIBRARY_PATH /usr/local/gmp/lib:/usr/local/mpfr/lib:/usr/local/mpc/lib:$LD_LIBRARY_PATH
+RUN apt-get update
+RUN apt-get install -y texinfo
+WORKDIR /build
+RUN wget -nv https://ftp.gnu.org/gnu/binutils/binutils-2.30.tar.xz
+RUN tar Jxf binutils-2.30.tar.xz
+WORKDIR /build/binutils-2.30/build
 RUN ../configure --target=sh-elf --prefix=/usr/local/sh-tools
 RUN make -s -j8
 RUN make -s install
 WORKDIR /build
-RUN wget -nv http://ftp.tsukuba.wide.ad.jp/software/gcc/releases/gcc-3.4.5/gcc-3.4.5.tar.bz2
-RUN tar jxf gcc-3.4.5.tar.bz2
-RUN sed -i -e "s/O_CREAT/O_CREAT, 0755/g" gcc-3.4.5/gcc/collect2.c
+RUN wget -nv https://gmplib.org/download/gmp/gmp-6.1.2.tar.xz
+RUN tar Jxf gmp-6.1.2.tar.xz
+WORKDIR /build/gmp-6.1.2/build
+RUN ../configure --prefix=/usr/local/gmp
+RUN make -s -j8
+RUN make install
 WORKDIR /build
-RUN wget -nv ftp://sourceware.org/pub/newlib/newlib-1.14.0.tar.gz
-RUN tar zxf newlib-1.14.0.tar.gz
-WORKDIR /build/gcc-3.4.5
-RUN ln -s ../newlib-1.14.0/newlib ../newlib-1.14.0/libgloss ../newlib-1.14.0/COPYING.NEWLIB .
-WORKDIR /build/gcc-3.4.5/build
-ENV CFLAGS ""
-RUN ../configure --target=sh-elf --enable-languages=c --prefix=/usr/local/sh-tools -with-newlib -with-headers=/build/newlib-1.14.0/newlib/libc/include
+RUN wget -nv https://www.mpfr.org/mpfr-current/mpfr-4.0.2.tar.xz
+RUN tar Jxf mpfr-4.0.2.tar.xz
+WORKDIR /build/mpfr-4.0.2/build
+RUN ../configure --with-gmp=/usr/local/gmp --prefix=/usr/local/mpfr
+RUN make -s -j8
+RUN make install
+WORKDIR /build
+RUN wget -nv https://ftp.gnu.org/gnu/mpc/mpc-1.1.0.tar.gz
+RUN tar zxf mpc-1.1.0.tar.gz
+WORKDIR /build/mpc-1.1.0/build
+RUN ../configure --with-gmp=/usr/local/gmp --with-mpfr=/usr/local/mpfr --prefix=/usr/local/mpc
+RUN make -s -j8
+RUN make install
+WORKDIR /build
+RUN wget -nv http://ftp.tsukuba.wide.ad.jp/software/gcc/releases/gcc-7.3.0/gcc-7.3.0.tar.xz
+RUN tar Jxf gcc-7.3.0.tar.xz
+WORKDIR /build/gcc-7.3.0/build_step1
+RUN ../configure --target=sh-elf --prefix=/usr/local/sh-tools --with-gmp=/usr/local/gmp --with-mpfr=/usr/local/mpfr --with-mpc=/usr/local/mpc --enable-languages=c --disable-libssp
+RUN make -s -j8
+RUN make -s install
+WORKDIR /build
+RUN wget -nv ftp://sourceware.org/pub/newlib/newlib-3.0.0.tar.gz
+RUN tar zxf newlib-3.0.0.tar.gz
+WORKDIR /build/newlib-3.0.0/build
+RUN ../configure --target=sh-elf --prefix=/usr/local/sh-tools
+RUN make -s -j8
+RUN make install
+WORKDIR /build/gcc-7.3.0/build_step2
+RUN ../configure --target=sh-elf --prefix=/usr/local/sh-tools --with-gmp=/usr/local/gmp --with-mpfr=/usr/local/mpfr --with-mpc=/usr/local/mpc --enable-languages=c --disable-libssp -with-newlib -with-headers=/build/newlib-3.0.0/newlib/libc/include
 RUN make -s -j8
 RUN make -s install
 
@@ -68,7 +94,11 @@ RUN ALPINE_GLIBC_BASE_URL="https://github.com/sgerrand/alpine-pkg-glibc/releases
         "$ALPINE_GLIBC_BIN_PACKAGE_FILENAME" \
         "$ALPINE_GLIBC_I18N_PACKAGE_FILENAME"
 COPY --from=build-env /usr/local/sh-tools /usr/local/sh-tools
+COPY --from=build-env /usr/local/gmp /usr/local/gmp
+COPY --from=build-env /usr/local/mpfr /usr/local/mpfr
+COPY --from=build-env /usr/local/mpc /usr/local/mpc
 ENV PATH $PATH:/usr/local/sh-tools/bin
+ENV LD_LIBRARY_PATH /usr/local/gmp/lib:/usr/local/mpfr/lib:/usr/local/mpc/lib:$LD_LIBRARY_PATH
 RUN apk add --no-cache make
 WORKDIR /workspace
 ENTRYPOINT ["make"]
