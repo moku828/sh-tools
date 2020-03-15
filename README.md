@@ -4,10 +4,20 @@ Toolchain for SH7262(make, qemu, gdb) and TOPPERS sample
 ## make
     docker build -t sh-tools/make .
     docker run --rm -it -vC:\Users\basas\Downloads\sh7262_bootrom-sh2a_isa_test:/workspace sh-tools/make
+    docker run --rm -it -vC:\test\sh7262_an\task:/workspace --entrypoint=/usr/local/sh-tools/bin/sh-elf-nm sh-tools/make task.elf
 
 ## toppers_sample
     docker build -t sh-tools/toppers_sample .
     docker run --rm -it sh-tools/toppers_sample
+    docker cp CONTAINER:/asp C:\test\toppers_sample
+    docker run --rm -it -vC:\test\toppers_sample\asp:/asp sh-tools/toppers_sample ../configure -T apsh2a_gcc
+    docker run --rm -it -vC:\test\toppers_sample\asp:/asp sh-tools/toppers_sample make depend
+    docker run --rm -it -vC:\test\toppers_sample\asp:/asp sh-tools/toppers_sample make
+    docker run --rm -it -vC:\test\toppers_sample\asp:/asp sh-tools/toppers_sample make asp.bin
+    docker run --rm -it -vC:\test\toppers_sample\asp:/asp sh-tools/toppers_sample sh-elf-nm asp | grep \s__kernel_start$
+    docker run --rm -it -vC:\test\toppers_sample\asp:/asp sh-tools/toppers_sample ../configure -T frksh2a_gcc
+HJ-LINK/USB Debugger for SH7262起動
+Download program...からasp選んでPC:1C0004E4(__kernel_startのアドレス)に書き換えてRun
 
 ## qemu
     docker build -t sh-tools/qemu .
