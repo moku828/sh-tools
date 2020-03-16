@@ -46,7 +46,7 @@ RUN ../configure --target=sh-elf --prefix=/usr/local/sh-tools
 RUN make -s -j8
 RUN make install
 WORKDIR /build/gcc-7.3.0/build_step2
-RUN ../configure --target=sh-elf --prefix=/usr/local/sh-tools --with-gmp=/usr/local/gmp --with-mpfr=/usr/local/mpfr --with-mpc=/usr/local/mpc --enable-languages=c --disable-libssp -with-newlib -with-headers=/build/newlib-3.0.0/newlib/libc/include
+RUN LDFLAGS="-static" ../configure --target=sh-elf --prefix=/usr/local/sh-tools --with-gmp=/usr/local/gmp --with-mpfr=/usr/local/mpfr --with-mpc=/usr/local/mpc --enable-languages=c --disable-libssp -with-newlib -with-headers=/build/newlib-3.0.0/newlib/libc/include
 RUN make -s -j8
 RUN make -s install
 
@@ -94,9 +94,6 @@ RUN ALPINE_GLIBC_BASE_URL="https://github.com/sgerrand/alpine-pkg-glibc/releases
         "$ALPINE_GLIBC_BIN_PACKAGE_FILENAME" \
         "$ALPINE_GLIBC_I18N_PACKAGE_FILENAME"
 COPY --from=build-env /usr/local/sh-tools /usr/local/sh-tools
-COPY --from=build-env /usr/local/gmp /usr/local/gmp
-COPY --from=build-env /usr/local/mpfr /usr/local/mpfr
-COPY --from=build-env /usr/local/mpc /usr/local/mpc
 ENV PATH $PATH:/usr/local/sh-tools/bin
 ENV LD_LIBRARY_PATH /usr/local/gmp/lib:/usr/local/mpfr/lib:/usr/local/mpc/lib:$LD_LIBRARY_PATH
 RUN apk add --no-cache make
