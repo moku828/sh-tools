@@ -2,7 +2,7 @@ FROM gcc:7.4.0 AS build-env
 WORKDIR /build
 RUN git clone https://github.com/moku828/qemu
 WORKDIR /build/qemu
-RUN git pull && git checkout f8d28d247c847582abe65e9656cf49ee95fdea93
+RUN git pull && git checkout 772ef0b786a6b82e93121c26d1c01f0534f62b23
 WORKDIR /build/qemu/build
 RUN ../configure --disable-bsd-user --disable-guest-agent --disable-strip --disable-werror --disable-gcrypt --disable-debug-info --disable-debug-tcg --disable-docs --disable-tcg-interpreter --enable-attr --disable-brlapi --disable-linux-aio --disable-bzip2 --disable-bluez --disable-cap-ng --disable-curl --disable-fdt --disable-glusterfs --disable-gnutls --disable-nettle --disable-gtk --disable-rdma --disable-libiscsi --disable-vnc-jpeg --disable-kvm --disable-lzo --disable-curses --disable-libnfs --disable-numa --disable-opengl --disable-vnc-png --disable-rbd --disable-vnc-sasl --disable-sdl --disable-seccomp --disable-smartcard --disable-snappy --disable-spice --disable-libssh2 --disable-libusb --disable-usb-redir --disable-vde --disable-vhost-net --disable-virglrenderer --disable-virtfs --disable-vnc --disable-vte --disable-xen --disable-xen-pci-passthrough --disable-xfsctl --disable-linux-user --enable-system --disable-blobs --disable-tools --target-list=sh4eb-softmmu --static --disable-pie
 RUN make -j8
